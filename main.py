@@ -9,6 +9,7 @@ Loads several images sequentially and tries to find squares in each image.
 # Python 2/3 compatibility
 from __future__ import print_function
 import sys
+import random
 PY3 = sys.version_info[0] == 3
 
 if PY3:
@@ -26,8 +27,8 @@ def angle_cos(p0, p1, p2):
 def find_squares(img):
     img = cv.GaussianBlur(img, (5, 5), 0)
     squares = []
-    for gray in cv.split(img):
-        for thrs in xrange(0, 255, 26):
+    for gray in [cv.split(img)[0]]:
+        for thrs in [70]: # xrange(0, 255, 26):
             if thrs == 0:
                 bin = cv.Canny(gray, 0, 50, apertureSize=5)
                 bin = cv.dilate(bin, None)
@@ -51,7 +52,7 @@ def main():
     fn = sys.argv[1]
     img = cv.imread(fn)
     squares = find_squares(img)
-    # cv.drawContours( img, squares, -1, (0, 255, 0), 3 )
+    cv.drawContours( img, squares, -1, (0, 255, 0), 3 )
     # cv.imwrite(fn, img)
     
     data = {}
@@ -64,13 +65,23 @@ def main():
         approx = cv.approxPolyDP(contour, epsilon, True)
         vertices = approx.reshape(-1, 2)
         br = cv.boundingRect(contour)
+
+        color = (random.randint(0,256), random.randint(0,256), random.randint(0,256))
+        cv.rectangle(img, (int(br[0]), int(br[1])), \
+        (int(br[0]+br[2]), int(br[1]+br[3])), color, 2)
+
         data["rects"].append([ br[0], br[1], br[2], br[3] ])
         # print(vertices)
+
 
     json_fn = fn.split('.')[0] + '.json'
     
     with open(json_fn, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
+
+    # cv.namedWindow('img', cv.WINDOW_NORMAL)
+    # cv.imshow("img", img)
+    # cv.waitKey()
 
     print('Done')
 

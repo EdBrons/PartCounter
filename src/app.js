@@ -7,6 +7,7 @@ function randomColor() {
 
 export class App {
     constructor() {
+        this.rects = []
         this.firstPoint = null;
         document.getElementById('uploadForm').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -32,7 +33,9 @@ export class App {
         let fn = data["filename"]
 
         document.getElementById("upload").hidden = true
+        document.getElementById("info").hidden = false
         this.initPixi(fn, rects)
+        document.getElementById("parts").innerHTML = "" + this.rects.length + " Parts."
     }
     initPixi(filename, rects) {
         this.pixiApp = new PIXI.Application({ resizeTo: window });
@@ -133,5 +136,8 @@ export class App {
         rect.beginFill(randomColor(), .2);
         rect.drawRect(r.x, r.y, r.width, r.height);
         this.viewport.addChild(rect);
+
+        this.rects.push(rect);
+        document.getElementById("parts").innerHTML = "" + this.rects.length + " Parts."
     }
 }

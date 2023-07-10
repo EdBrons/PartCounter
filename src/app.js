@@ -132,8 +132,8 @@ export class App {
     addPartRect(p1, p2) {
         let r = this.getRect(p1, p2);
         let rect = new PIXI.Graphics();
-        rect.lineStyle(2, randomColor(), .75);
-        rect.beginFill(randomColor(), .2);
+        rect.lineStyle(4, randomColor());
+        rect.beginFill(0x0000FF, .5);
         rect.drawRect(r.x, r.y, r.width, r.height);
         this.viewport.addChild(rect);
 

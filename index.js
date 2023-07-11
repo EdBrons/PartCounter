@@ -8,6 +8,9 @@ const upload = multer({ dest: 'public/uploads/' });
 app.use("/public", express.static(__dirname + '/public'));
 app.use("/", express.static(__dirname + '/dist'));
 
+const port = 3000;
+
+// helper function to run the python script with fn being the filename to input
 let runPy = (fn) => new Promise(function (success, nosuccess) {
     const { spawn } = require('child_process');
     const pyprog = spawn('venv/bin/python', ['./main.py', fn]);
@@ -26,6 +29,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/upload', upload.single('image'), async (req, res) => {
+    console.log('Received an upload.')
     if (req.file) {
         const originalPath = req.file.path;
         const targetPath = `${req.file.destination}${req.file.filename}.jpg`;
@@ -43,7 +47,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
 
         runPy(targetPath).then(
             result => {
-                console.log(result.toString());
+                console.log('Image processed successfully.')
                 var json_file = require('./' + targetPath.split('.')[0] + '.json')
                 res.json(json_file)
             },
@@ -58,7 +62,6 @@ app.post('/upload', upload.single('image'), async (req, res) => {
     }
 });
 
-const port = 3000;
 app.listen(port, () => {
     console.log(`Server is listening on port ${port}`);
 });

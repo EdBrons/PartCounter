@@ -1,15 +1,25 @@
-# 🚀 Welcome to your new awesome project!
+# Part Counter
 
-This project has been created using **webpack-cli**, you can now run
+## Installing the project
+
+Create a virtual environment for python and activate it.
+```
+python -m venv venv
+source venv/bin/active
+```
+Install the python dependencies
+```
+pip install -r requirements.txt
+```
+Install the node dependencies
+```
+npm install
+```
+Now you are ready to run the project.
+
+## Running the project
 
 ```
-npm run build
+npm run server:start
+npm run watch
 ```
-
-or
-
-```
-yarn build
-```
-
-to bundle your application

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Webpack App</title>
+</head>
+
+<!-- <body oncontextmenu="return false;"> -->
+
+<body>
+    <div class="container" id="upload">
+        <h1>Part Counter v1</h1>
+        <h2>Instructions</h2>
+        <h3>Step 1: Upload an Image</h3>
+        <div class="row">
+            <div class="col">
+                <p>Take a photo of a tray of parts, like the one on the right.</p>
+                <p>Click browse and select the image from your computer.</p>
+                <p>Click upload to scan the image for parts.</p>
+            </div>
+            <div class="col">
+                <figure>
+                    <img src="public/images/1.JPG" class="img-fluid">
+                    <figcaption>An example of a high quality image.</figcaption>
+                </figure>
+            </div>
+        </div>
+        <h3>Step 2: Usage</h3>
+        <p>The program scans the image for parts, if it finds a part it covers it with a blue rectangle.</p>
+        <p>The program does not always discover all the parts. You will have to manually add the parts it does not find.
+        </p>
+        <p>Click and drag the mouse to move the camera.</p>
+        <p>
+            Press <span>P</span> to start placing a part.
+            Then click to start placing a rectangle,
+            move you mouse to the opposite corner of the part and click again.
+        </p>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input id="files" type="file" name="image" accept="image/*" />
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+    <div id="info" hidden>
+        <p> <span id="parts">0</span> Parts </p>
+    </div>
+</body>
+
+</html>

@@ -18,16 +18,22 @@
     "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
     "@webpack-cli/generators": "^3.0.7",
+    "autoprefixer": "^10.4.14",
     "babel-loader": "^9.1.2",
     "css-loader": "^6.8.1",
     "html-webpack-plugin": "^5.5.3",
     "nodemon": "^3.0.1",
+    "postcss-loader": "^7.3.3",
+    "sass": "^1.63.6",
+    "sass-loader": "^13.3.2",
     "style-loader": "^3.3.3",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.0",
     "multer": "^1.4.5-lts.1",
     "pixi-viewport": "^5.0.1",
     "pixi.js": "^7.2.4"

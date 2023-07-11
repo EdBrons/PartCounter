@@ -1,0 +1,20 @@
+@import "bootstrap/scss/bootstrap";
+
+#full {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+#info {
+    margin: auto;
+    padding: auto;
+    overflow: hidden;
+
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 200px;
+    height: 100px;
+    background-color: beige;
+}

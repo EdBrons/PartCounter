@@ -2,6 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const fs = require("fs");
 const path = require("path");
+const findRemoveSync = require('find-remove');
 
 const app = express();
 const upload = multer({ dest: 'public/uploads/' });
@@ -10,7 +11,7 @@ app.use("/public", express.static(path.resolve(__dirname + '/../public')));
 app.use("/", express.static(path.resolve(__dirname + '/../dist')));
 // app.use("/", express.static(__dirname + '../dist'));
 
-const port = 3000;
+const port = 8080;
 
 // helper function to run the python script with fn being the filename to input
 let runPy = (fn) => new Promise(function (success, nosuccess) {
@@ -31,6 +32,15 @@ app.get('/', function (req, res) {
 });
 
 app.post('/upload', upload.single('image'), async (req, res) => {
+
+    console.log(path.resolve(__dirname + '/../public/uploads'))
+    const result = findRemoveSync(path.resolve(__dirname + '/../public/uploads'), { age: { seconds: 10 } });
+    for (let filename in result) {
+        if (result[filename]) {
+            console.log('Removed file ' + filename + ' reason: old.')
+        }
+    }
+
     console.log('Received an upload.')
     if (req.file) {
         const originalPath = req.file.path;
@@ -62,6 +72,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         console.log('No file uploaded.');
         res.send('No file uploaded!');
     }
+
 });
 
 app.listen(port, () => {

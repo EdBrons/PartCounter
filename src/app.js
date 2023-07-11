@@ -9,6 +9,9 @@ export class App {
     constructor() {
         this.rects = []
         this.firstPoint = null;
+        this.handleUploadForm();
+    }
+    handleUploadForm() {
         document.getElementById('uploadForm').addEventListener('submit', (e) => {
             e.preventDefault();
             this.getData(e).finally(
@@ -16,10 +19,9 @@ export class App {
                     console.log("Success.")
                 },
                 error => {
-                    console.log("Couldn't upload that file.");
+                    console.log("Failure.");
                 }
             )
-
         });
     }
     async getData(e) {
@@ -35,9 +37,9 @@ export class App {
         document.getElementById("upload").hidden = true
         document.getElementById("info").hidden = false
         this.initPixi(fn, rects)
-        document.getElementById("parts").innerHTML = "" + this.rects.length + " Parts."
     }
     initPixi(filename, rects) {
+        this.mode = 'creation'
         this.pixiApp = new PIXI.Application({ resizeTo: window });
         document.body.appendChild(this.pixiApp.view);
 
@@ -77,21 +79,27 @@ export class App {
 
 
         this.viewport.on('mousemove', (e) => {
-            this.crosshairs.clear();
+            if (this.mode == 'creation') {
+                this.crosshairs.clear();
 
-            this.crosshairs.lineStyle(6, 0x808080, .4);
-            this.crosshairs.moveTo(e.global.x, 0);
-            this.crosshairs.lineTo(e.global.x, window.innerHeight);
-            this.crosshairs.moveTo(0, e.global.y);
-            this.crosshairs.lineTo(window.innerWidth, e.global.y);
+                this.crosshairs.lineStyle(6, 0x808080, .4);
+                this.crosshairs.moveTo(e.global.x, 0);
+                this.crosshairs.lineTo(e.global.x, window.innerHeight);
+                this.crosshairs.moveTo(0, e.global.y);
+                this.crosshairs.lineTo(window.innerWidth, e.global.y);
 
-            if (this.firstPoint != null) {
-                this.newRect.clear();
-                let r = this.getRect(this.firstPoint, this.viewport.toWorld(e.clientX, e.clientY));
-                this.newRect.lineStyle(2, 0xFF0000, .75);
-                this.newRect.drawRect(r.x, r.y, r.width, r.height);
+                if (this.firstPoint != null) {
+                    this.newRect.clear();
+                    let r = this.getRect(this.firstPoint, this.viewport.toWorld(e.clientX, e.clientY));
+                    this.newRect.lineStyle(2, 0xFF0000, .75);
+                    this.newRect.drawRect(r.x, r.y, r.width, r.height);
+                }
             }
         });
+
+        document.addEventListener('keypress', (e) => {
+            console.log(e.key);
+        })
 
         this.viewport.drag().pinch().wheel().decelerate().clamp({ direction: 'all' });
 
@@ -111,13 +119,15 @@ export class App {
             const diffY = Math.abs(e.pageY - this.startY);
 
             if (diffX < this.clickDelta && diffY < this.clickDelta) {
-                if (this.firstPoint == null) {
-                    this.firstPoint = this.viewport.toWorld(e.clientX, e.clientY);
-                }
-                else {
-                    let newPoint = this.viewport.toWorld(e.clientX, e.clientY);
-                    this.addPartRect(this.firstPoint, newPoint);
-                    this.firstPoint = null;
+                if (this.mode == 'creation') {
+                    if (this.firstPoint == null) {
+                        this.firstPoint = this.viewport.toWorld(e.clientX, e.clientY);
+                    }
+                    else {
+                        let newPoint = this.viewport.toWorld(e.clientX, e.clientY);
+                        this.addPartRect(this.firstPoint, newPoint);
+                        this.firstPoint = null;
+                    }
                 }
             }
         });

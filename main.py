@@ -27,8 +27,8 @@ def angle_cos(p0, p1, p2):
 def find_squares(img):
     img = cv.GaussianBlur(img, (5, 5), 0)
     squares = []
-    for gray in [cv.split(img)[0]]:
-        for thrs in [70]: # xrange(0, 255, 26):
+    for gray in cv.split(img):
+        for thrs in xrange(0, 255, 10):
             if thrs == 0:
                 bin = cv.Canny(gray, 0, 50, apertureSize=5)
                 bin = cv.dilate(bin, None)
@@ -42,7 +42,23 @@ def find_squares(img):
                     cnt = cnt.reshape(-1, 2)
                     max_cos = np.max([angle_cos( cnt[i], cnt[(i+1) % 4], cnt[(i+2) % 4] ) for i in xrange(4)])
                     if max_cos < 0.1:
-                        squares.append(cnt)
+                        r1 = cv.boundingRect(cnt)
+                        overlaps = False
+                        for r2 in squares:
+                            left = max(r1[0], r2[0])
+                            right = min(r1[0] + r1[2], r2[0] + r1[2])
+                            bottom = min(r1[1] + r1[3], r2[1] + r2[3])
+                            top = max(r1[1], r2[1])
+                            if left < right and bottom > top:
+                                a1 = r1[2] * r1[3]
+                                a2 = r2[2] * r2[3]
+                                a3 = (right - left) * (bottom - top)
+                                overlap_perc = a3 / (a1 + a2 - a3)
+                                if overlap_perc > .5:
+                                    overlaps = True
+                                    break
+                        if not overlaps:
+                            squares.append(r1)
     return squares
 
 def main():
@@ -52,7 +68,7 @@ def main():
     fn = sys.argv[1]
     img = cv.imread(fn)
     squares = find_squares(img)
-    cv.drawContours( img, squares, -1, (0, 255, 0), 3 )
+    # cv.drawContours( img, squares, -1, (0, 255, 0), 3 )
     # cv.imwrite(fn, img)
     
     data = {}
@@ -60,12 +76,7 @@ def main():
     
     data["filename"] = fn
     
-    for contour in squares:
-        epsilon = 0.01 * cv.arcLength(contour, True)
-        approx = cv.approxPolyDP(contour, epsilon, True)
-        vertices = approx.reshape(-1, 2)
-        br = cv.boundingRect(contour)
-
+    for br in squares:
         color = (random.randint(0,256), random.randint(0,256), random.randint(0,256))
         cv.rectangle(img, (int(br[0]), int(br[1])), \
         (int(br[0]+br[2]), int(br[1]+br[3])), color, 2)

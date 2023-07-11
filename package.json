@@ -10,7 +10,7 @@
     "build:prod": "webpack --mode=production --node-env=production",
     "watch": "webpack --watch",
     "serve": "webpack serve",
-    "server:start": "nodemon index.js --ignore ./public"
+    "server:start": "nodemon ./server/index.js --ignore ./public"
   },
   "author": "",
   "license": "ISC",

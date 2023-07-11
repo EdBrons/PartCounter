@@ -1,19 +1,21 @@
 const express = require('express');
 const multer = require('multer');
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 const upload = multer({ dest: 'public/uploads/' });
 
-app.use("/public", express.static(__dirname + '/public'));
-app.use("/", express.static(__dirname + '/dist'));
+app.use("/public", express.static(path.resolve(__dirname + '/../public')));
+app.use("/", express.static(path.resolve(__dirname + '/../dist')));
+// app.use("/", express.static(__dirname + '../dist'));
 
 const port = 3000;
 
 // helper function to run the python script with fn being the filename to input
 let runPy = (fn) => new Promise(function (success, nosuccess) {
     const { spawn } = require('child_process');
-    const pyprog = spawn('venv/bin/python', ['./main.py', fn]);
+    const pyprog = spawn('venv/bin/python', ['server/main.py', fn]);
 
     pyprog.stdout.on('data', function (data) {
         success(data);
@@ -25,7 +27,7 @@ let runPy = (fn) => new Promise(function (success, nosuccess) {
 });
 
 app.get('/', function (req, res) {
-    res.sendFile('dist/index.html', { root: __dirname });
+    res.sendFile(path.resolve(__dirname + '/../dist/index.html'));
 });
 
 app.post('/upload', upload.single('image'), async (req, res) => {
@@ -48,7 +50,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
         runPy(targetPath).then(
             result => {
                 console.log('Image processed successfully.')
-                var json_file = require('./' + targetPath.split('.')[0] + '.json')
+                var json_file = require(path.resolve(__dirname + '/../' + targetPath.split('.')[0] + '.json'))
                 res.json(json_file)
             },
             error => {

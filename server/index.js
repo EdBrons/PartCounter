@@ -16,7 +16,8 @@ const port = 8080;
 // helper function to run the python script with fn being the filename to input
 let runPy = (fn) => new Promise(function (success, nosuccess) {
     const { spawn } = require('child_process');
-    const pyprog = spawn('venv/bin/python', ['server/main.py', fn]);
+    console.log(path.resolve(__dirname + '/../venv/bin/python'));
+    const pyprog = spawn(path.resolve(__dirname + '/../venv/bin/python'), ['server/main.py', fn]);
 
     pyprog.stdout.on('data', function (data) {
         success(data);

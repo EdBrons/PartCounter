@@ -65,6 +65,7 @@ app.post('/upload', upload.single('image'), async (req, res) => {
                 res.json(json_file)
             },
             error => {
+                console.log(error)
                 console.log(error.toString())
                 res.status(500).send('Error processing image.')
             }

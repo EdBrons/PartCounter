@@ -51,11 +51,12 @@ def find_squares(img):
             else:
                 _retval, bin = cv.threshold(gray, thrs, 255, cv.THRESH_BINARY)
             contours, _hierarchy = cv.findContours(bin, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE)
+            
             for cnt in contours:
                 cnt_len = cv.arcLength(cnt, True)
                 cnt = cv.approxPolyDP(cnt, 0.02*cnt_len, True)
                 # check number of sides and area
-                if len(cnt) == 4 and cv.contourArea(cnt) > 1000 and cv.contourArea(cnt) < 40000 and cv.isContourConvex(cnt):
+                if len(cnt) == 4 and cv.contourArea(cnt) > 800 and cv.contourArea(cnt) < 40000 and cv.isContourConvex(cnt):
                     cnt = cnt.reshape(-1, 2)
                     max_cos = np.max([angle_cos( cnt[i], cnt[(i+1) % 4], cnt[(i+2) % 4] ) for i in xrange(4)])
                     # check to make sure it has approximately right angles
@@ -73,9 +74,13 @@ def find_squares(img):
                                 if overlap_perc > .5:
                                     overlaps = True
                                     break
+                                if inside_of(r2, r1) or inside_of(r1, r2):
+                                    overlaps = True
+                                    break
                         if not overlaps:
                             squares.append(r1)
-    
+
+    return squares
     areas = [ r[2] * r[3] for r in squares ]
     if len(areas) > 0:
         mean_area = sum(areas) / len(areas)
@@ -132,6 +137,8 @@ def main():
         with open(json_fn, 'w', encoding='utf-8') as f:
             print('writing to ' + json_fn)
             json.dump(data, f, ensure_ascii=False, indent=4)
+            
+    print(f'Found {len(rects)} parts.')
             
     if args.save:
         cv.imwrite(img_fn, img)

@@ -15,7 +15,6 @@ const port = 8080;
 // helper function to run the python script with fn being the filename to input
 let runPy = (fn) => new Promise(function (success, nosuccess) {
     const { spawn } = require('child_process');
-    console.log(path.resolve(__dirname + '/../venv/bin/python'));
     const pyprog = spawn(path.resolve(__dirname + '/../venv/bin/python'), ['server/findsquares.py', '-j', fn]);
 
     pyprog.stdout.on('data', function (data) {
@@ -34,7 +33,9 @@ app.get('/', function (req, res) {
 app.post('/upload', upload.single('image'), async (req, res) => {
 
     console.log(path.resolve(__dirname + '/../public/uploads'))
-    const result = findRemoveSync(path.resolve(__dirname + '/../public/uploads'), { age: { seconds: 10 } });
+
+    const result = findRemoveSync(path.resolve(__dirname + '/../public/uploads'), { files: "*.*", age: { seconds: 10 } });
+
     for (let filename in result) {
         if (result[filename]) {
             console.log('Removed file ' + filename + ' reason: old.')

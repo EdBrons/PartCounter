@@ -80,7 +80,6 @@ def find_squares(img):
                         if not overlaps:
                             squares.append(r1)
 
-    return squares
     areas = [ r[2] * r[3] for r in squares ]
     if len(areas) > 0:
         mean_area = sum(areas) / len(areas)

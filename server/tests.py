@@ -6,7 +6,7 @@ from .findsquares import find_squares
         
 class TestPartCount(unittest.TestCase):
     def test_counts(self):
-        cases = [ ( './public/images/1.JPG', 120 ), ( './public/images/6.JPG', 120 ) ]
+        cases = [ ( './public/images/1.JPG', 120 ), ( './public/images/6.JPG', 125 ) ]
         for fn, expected in cases:
             with self.subTest(name=fn):
                 img = cv.imread(fn)

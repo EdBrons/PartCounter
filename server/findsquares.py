@@ -77,9 +77,11 @@ def find_squares(img):
                             squares.append(r1)
     
     areas = [ r[2] * r[3] for r in squares ]
-    mean_area = sum(areas) / len(areas)
-    
-    return [ r for r in squares if r[2] * r[3] < mean_area * 2 ]
+    if len(areas) > 0:
+        mean_area = sum(areas) / len(areas)
+        return [ r for r in squares if r[2] * r[3] < mean_area * 2 ]
+    else:
+        return squares
 
 def main():
     parser = argparse.ArgumentParser(

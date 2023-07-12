@@ -1,14 +1,9 @@
 #!/usr/bin/env python
 
-'''
-Simple "Square Detector" program.
-
-Loads several images sequentially and tries to find squares in each image.
-'''
-
 # Python 2/3 compatibility
 from __future__ import print_function
 import sys
+import os
 import random
 PY3 = sys.version_info[0] == 3
 
@@ -18,7 +13,7 @@ if PY3:
 import numpy as np
 import cv2 as cv
 import json
-
+import argparse
 
 def angle_cos(p0, p1, p2):
     d1, d2 = (p0-p1).astype('float'), (p2-p1).astype('float')
@@ -39,6 +34,8 @@ def rect_overlap(r1, r2):
         return (left, top, right - left, bottom - top)
     return None
 
+def inside_of(r1, r2):
+    return r1[0] >= r2[0] and r1[1] >= r2[1] and r1[2] <= r2[2] and r1[3] <= r2[3]
 
 # finds the contours of the parts in the image
 # returns the bounding boxes of these contours
@@ -78,41 +75,71 @@ def find_squares(img):
                                     break
                         if not overlaps:
                             squares.append(r1)
-    return squares
+    
+    areas = [ r[2] * r[3] for r in squares ]
+    mean_area = sum(areas) / len(areas)
+    
+    return [ r for r in squares if r[2] * r[3] < mean_area * 2 ]
 
 def main():
-    if len(sys.argv) != 2:
-        print('Usage: ./main.py [filename]')
-        return 1
+    parser = argparse.ArgumentParser(
+                    prog='FindSquares',
+                    description='Finds squares')
+    
+    parser.add_argument('filename', type=str, help='The file to process.')
+    parser.add_argument('-w', '--window', action='store_true', help='Display output in opencv window')
+    parser.add_argument('-o', '--outdir', help='Directory to save output to')
+    parser.add_argument('-j', '--json', action='store_true', help='Save bounding rects to JSON')
+    parser.add_argument('-s', '--save', action='store_true', help='Save modified image, note if outdir not set, this will overwrite existing file.')
+    
+    args = parser.parse_args()
 
-    fn = sys.argv[1]
+    fn = args.filename
+
+    root, ext = os.path.splitext(fn)
+    basename = os.path.basename(fn)
+    bn_no_ext = basename.split('.')[0]
+    
+    if args.outdir is not None:
+        json_fn = os.path.join(args.outdir, bn_no_ext + '.json')
+        img_fn = os.path.join(args.outdir, bn_no_ext + '.' + ext)
+    else:
+        json_fn = root + '.json'
+        img_fn = root + '.' + ext
+
     img = cv.imread(fn)
-    squares = find_squares(img)
+    if img is None:
+        sys.exit(1)
+
+    rects = find_squares(img)
     
-    data = {}
-    data["rects"] = []
-    data["filename"] = fn
+    for r in rects:
+        x, y, w, h = r
+        p1 = (x, y)
+        p2 = (x + w, y + h)
+        cv.rectangle(img, p1, p2, (255, 0, 0), 4)
     
-    for br in squares:
-        # color = (random.randint(0,256), random.randint(0,256), random.randint(0,256))
-        # cv.rectangle(img, (int(br[0]), int(br[1])), \
-        # (int(br[0]+br[2]), int(br[1]+br[3])), color, 2)
-        data["rects"].append([ br[0], br[1], br[2], br[3] ])
+    if args.json:
+        data = {}
+        data["rects"] = []
+        data["filename"] = fn
 
+        for br in rects:
+            data["rects"].append([ br[0], br[1], br[2], br[3] ])
 
-    json_fn = fn.split('.')[0] + '.json'
+        with open(json_fn, 'w', encoding='utf-8') as f:
+            print('writing to ' + json_fn)
+            json.dump(data, f, ensure_ascii=False, indent=4)
+            
+    if args.save:
+        cv.imwrite(img_fn, img)
     
-    with open(json_fn, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-
-    # cv.namedWindow('img', cv.WINDOW_NORMAL)
-    # cv.imshow("img", img)
-    # cv.waitKey()
-
-    print('Done')
+    if args.window:
+        cv.namedWindow('output', cv.WINDOW_NORMAL)
+        cv.imshow("output", img)
+        cv.waitKey()
 
 
 if __name__ == '__main__':
-    print(__doc__)
     main()
     cv.destroyAllWindows()

@@ -9,7 +9,6 @@ const upload = multer({ dest: 'public/uploads/' });
 
 app.use("/public", express.static(path.resolve(__dirname + '/../public')));
 app.use("/", express.static(path.resolve(__dirname + '/../dist')));
-// app.use("/", express.static(__dirname + '../dist'));
 
 const port = 8080;
 
@@ -17,7 +16,7 @@ const port = 8080;
 let runPy = (fn) => new Promise(function (success, nosuccess) {
     const { spawn } = require('child_process');
     console.log(path.resolve(__dirname + '/../venv/bin/python'));
-    const pyprog = spawn(path.resolve(__dirname + '/../venv/bin/python'), ['server/main.py', fn]);
+    const pyprog = spawn(path.resolve(__dirname + '/../venv/bin/python'), ['server/findsquares.py', '-j', fn]);
 
     pyprog.stdout.on('data', function (data) {
         success(data);

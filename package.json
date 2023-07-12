@@ -11,8 +11,7 @@
     "watch": "webpack --watch",
     "serve": "webpack serve",
     "server:start": "nodemon ./server/index.js --ignore ./public",
-    "server:start:prod": "webpack --mode=production --node-env=production && node ./server/index.js",
-    "server:start:test": "node ./server/index.js"
+    "server:start:prod": "node ./server/index.js"
   },
   "author": "",
   "license": "ISC",

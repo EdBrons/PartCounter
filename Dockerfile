@@ -6,7 +6,6 @@ RUN apt-get update || : && apt-get install ffmpeg libsm6 libxext6 python3 python
 
 RUN python3 -m venv venv
 
-# RUN . venv/bin/activate
 COPY . .
 
 RUN ./venv/bin/pip install -r requirements.txt
@@ -14,6 +13,10 @@ RUN ./venv/bin/pip install -r requirements.txt
 COPY package*.json ./
 
 RUN npm install
+
+RUN npm run build:dev
+
+COPY ./dist .
 
 EXPOSE 8080
 CMD [ "npm", "run", "server:start:prod" ]
